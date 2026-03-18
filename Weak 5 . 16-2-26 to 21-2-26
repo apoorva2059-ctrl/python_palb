@@ -1,0 +1,441 @@
+
+WEAK 5 ( 16-2-26 t0 21-2-26)
+solution 1. // class Solution:
+class Solution:
+    def submatrixSum(self, a, n, m, query, q):
+        # Step 1: Build prefix sum matrix
+        prefix = [[0] * m for _ in range(n)]
+
+        for i in range(n):
+            for j in range(m):
+                prefix[i][j] = a[i][j]
+                if i > 0:
+                    prefix[i][j] += prefix[i - 1][j]
+                if j > 0:
+                    prefix[i][j] += prefix[i][j - 1]
+                if i > 0 and j > 0:
+                    prefix[i][j] -= prefix[i - 1][j - 1]
+
+        # Step 2: Answer queries
+        result = []
+
+        for i in range(q):
+            r1, c1, r2, c2 = query[i]
+
+            total = prefix[r2][c2]
+
+            if r1 > 0:
+                total -= prefix[r1 - 1][c2]
+            if c1 > 0:
+                total -= prefix[r2][c1 - 1]
+            if r1 > 0 and c1 > 0:
+                total += prefix[r1 - 1][c1 - 1]
+
+            result.append(total)
+
+        return result
+    
+    solution2 2 - class Solution:
+    def createFootpath(self, n, m, a, q, queries):
+        INF = 10**18
+
+        # Precompute directional minimum matrices
+        tl = [[INF]*m for _ in range(n)]
+        tr = [[INF]*m for _ in range(n)]
+        bl = [[INF]*m for _ in range(n)]
+        br = [[INF]*m for _ in range(n)]
+
+        # Top-left
+        for i in range(n):
+            for j in range(m):
+                tl[i][j] = a[i][j]
+                if i > 0:
+                    tl[i][j] = min(tl[i][j], tl[i-1][j])
+                if j > 0:
+                    tl[i][j] = min(tl[i][j], tl[i][j-1])
+
+        # Top-right
+        for i in range(n):
+            for j in range(m-1, -1, -1):
+                tr[i][j] = a[i][j]
+                if i > 0:
+                    tr[i][j] = min(tr[i][j], tr[i-1][j])
+                if j < m-1:
+                    tr[i][j] = min(tr[i][j], tr[i][j+1])
+
+        # Bottom-left
+        for i in range(n-1, -1, -1):
+            for j in range(m):
+                bl[i][j] = a[i][j]
+                if i < n-1:
+                    bl[i][j] = min(bl[i][j], bl[i+1][j])
+                if j > 0:
+                    bl[i][j] = min(bl[i][j], bl[i][j-1])
+
+        # Bottom-right
+        for i in range(n-1, -1, -1):
+            for j in range(m-1, -1, -1):
+                br[i][j] = a[i][j]
+                if i < n-1:
+                    br[i][j] = min(br[i][j], br[i+1][j])
+                if j < m-1:
+                    br[i][j] = min(br[i][j], br[i][j+1])
+
+        # Process queries
+        ans = []
+
+        for R, C in queries:
+            r = R - 1
+            c = C - 1
+            total = 0
+
+            # Top-left
+            if r > 0 and c > 0:
+                total += tl[r-1][c-1]
+
+            # Top-right
+            if r > 0 and c < m-1:
+                total += tr[r-1][c+1]
+
+            # Bottom-left
+            if r < n-1 and c > 0:
+                total += bl[r+1][c-1]
+
+            # Bottom-right
+            if r < n-1 and c < m-1:
+                total += br[r+1][c+1]
+
+            ans.append(total)
+
+        return ans
+    
+    solution 3. import heapq
+
+class Solution:
+    def minSteps(self, arr):
+        # Initial sum
+        total_sum = sum(arr)
+        target = total_sum / 2.0
+
+        # Max heap using negative values
+        max_heap = [-x for x in arr]
+        heapq.heapify(max_heap)
+
+        steps = 0
+        curr_sum = total_sum
+
+        while curr_sum > target:
+            # Take largest element
+            largest = -heapq.heappop(max_heap)
+
+            # Halve it
+            half = largest / 2.0
+
+            # Update sum
+            curr_sum -= (largest - half)
+
+            # Push back
+            heapq.heappush(max_heap, -half)
+
+            steps += 1
+
+        return steps
+    
+    solution 4.  class Solution:
+    def minPeople(self, arr):
+        n = len(arr)
+        intervals = []
+
+        # Step 1: Build intervals
+        for i in range(n):
+            if arr[i] != -1:
+                left = max(0, i - arr[i])
+                right = min(n - 1, i + arr[i])
+                intervals.append((left, right))
+
+        # Sort by starting point
+        intervals.sort()
+
+        # Step 2: Greedy coverage
+        count = 0
+        idx = 0
+        curr_end = 0
+        farthest = 0
+
+        while curr_end <= n - 1:
+            # Extend coverage as far as possible
+            while idx < len(intervals) and intervals[idx][0] <= curr_end:
+                farthest = max(farthest, intervals[idx][1])
+                idx += 1
+
+            # If cannot extend further
+            if farthest < curr_end:
+                return -1
+
+            count += 1
+            curr_end = farthest + 1  # move to next uncovered hour
+
+            if curr_end > n - 1:
+                break
+
+        return count
+    
+    solution 5. class Solution:
+    def prevSmaller(self, arr):
+        stack = []
+        result = []
+
+        for x in arr:
+            # Remove elements not strictly smaller
+            while stack and stack[-1] >= x:
+                stack.pop()
+
+            if stack:
+                result.append(stack[-1])
+            else:
+                result.append(-1)
+
+            stack.append(x)
+
+        return result
+    solution 6  class Solution:
+    def preGreaterEle(self, arr):
+        stack = []
+        result = []
+
+        for x in arr:
+            # Remove elements that are not strictly greater
+            while stack and stack[-1] <= x:
+                stack.pop()
+
+            if stack:
+                result.append(stack[-1])
+            else:
+                result.append(-1)
+
+            stack.append(x)
+
+        return result
+    
+    solution 7. class Solution:
+    def countSubarrays(self, arr):
+        n = len(arr)
+        stack = []
+        next_smaller = [n] * n  # default: no smaller element to the right
+
+        # Find Next Smaller Element index for each element
+        for i in range(n):
+            while stack and arr[stack[-1]] > arr[i]:
+                idx = stack.pop()
+                next_smaller[idx] = i
+            stack.append(i)
+
+        # Count valid subarrays
+        ans = 0
+        for i in range(n):
+            ans += next_smaller[i] - i
+
+        return ans
+    
+    solutuon 8 - class Solution:
+    def has132Pattern(self, arr):
+        n = len(arr)
+        if n < 3:
+            return False
+
+        stack = []
+        third = float('-inf')  # arr[k]
+
+        # Traverse from right to left
+        for i in range(n - 1, -1, -1):
+            if arr[i] < third:
+                return True
+
+            while stack and arr[i] > stack[-1]:
+                third = stack.pop()
+
+            stack.append(arr[i])
+
+        return False
+    
+    solution 9 -class Solution:
+    def maxPeople(self, arr):
+        n = len(arr)
+
+        left_block = [-1] * n   # index of nearest >= on left
+        right_block = [n] * n   # index of nearest >= on right
+
+        stack = []
+
+        # Nearest >= on the LEFT
+        for i in range(n):
+            while stack and arr[stack[-1]] < arr[i]:
+                stack.pop()
+            left_block[i] = stack[-1] if stack else -1
+            stack.append(i)
+
+        stack.clear()
+
+        # Nearest >= on the RIGHT
+        for i in range(n - 1, -1, -1):
+            while stack and arr[stack[-1]] < arr[i]:
+                stack.pop()
+            right_block[i] = stack[-1] if stack else n
+            stack.append(i)
+
+        ans = 0
+        for i in range(n):
+            visible_left = i - left_block[i] - 1
+            visible_right = right_block[i] - i - 1
+            ans = max(ans, visible_left + visible_right + 1)
+
+        return ans
+    
+    solution 10 - class Solution:
+    def combinationSum(self, n, k):
+        res = []
+
+        def backtrack(start, k, n, path):
+            # If exact combination found
+            if k == 0 and n == 0:
+                res.append(path[:])
+                return
+
+            # If invalid
+            if k == 0 or n < 0:
+                return
+
+            # Try numbers from start to 9
+            for num in range(start, 10):
+                if num > n:
+                    break
+                path.append(num)
+                backtrack(num + 1, k - 1, n - num, path)
+                path.pop()
+
+        backtrack(1, k, n, [])
+        return res
+    
+    solution 11 -  class Solution:
+    def equalPartition(self, arr):
+        n = len(arr)
+        total = sum(arr)
+        target = total // 2
+
+        # Required size of one subset
+        size1 = n // 2
+        size2 = n - size1   # other subset
+
+        used = [False] * n
+        result = []
+
+        def backtrack(index, count, curr_sum, subset):
+            # If required size reached
+            if count == size1:
+                if curr_sum == target:
+                    result.extend(subset)
+                    return True
+                return False
+
+            if index == n:
+                return False
+
+            # Choose current element
+            subset.append(arr[index])
+            used[index] = True
+            if backtrack(index + 1, count + 1, curr_sum + arr[index], subset):
+                return True
+            subset.pop()
+            used[index] = False
+
+            # Skip current element
+            if backtrack(index + 1, count, curr_sum, subset):
+                return True
+
+            return False
+
+        backtrack(0, 0, 0, [])
+
+        subset1 = result
+        subset2 = [arr[i] for i in range(n) if not used[i]]
+
+        return [subset1, subset2]
+    
+    solution 12 - class Solution:
+    def maxMinDiff(self, arr, k):
+        arr.sort()
+        n = len(arr)
+
+        # Helper function to check feasibility
+        def isPossible(diff):
+            count = 1
+            last = arr[0]
+
+            for i in range(1, n):
+                if arr[i] - last >= diff:
+                    count += 1
+                    last = arr[i]
+                    if count == k:
+                        return True
+            return False
+
+        low, high = 0, arr[-1] - arr[0]
+        ans = 0
+
+        while low <= high:
+            mid = (low + high) // 2
+            if isPossible(mid):
+                ans = mid
+                low = mid + 1
+            else:
+                high = mid - 1
+
+        return ans
+
+
+        solution 13 - class Solution:
+    def countLessEqual(self, arr, x):
+        n = len(arr)
+
+        # Step 1: Find pivot (index of minimum element)
+        low, high = 0, n - 1
+        while low < high:
+            mid = (low + high) // 2
+            if arr[mid] > arr[high]:
+                low = mid + 1
+            else:
+                high = mid
+        pivot = low
+
+        # Helper: count elements <= x in sorted subarray [l..r]
+        def countLE(l, r):
+            low, high = l, r
+            ans = l - 1
+            while low <= high:
+                mid = (low + high) // 2
+                if arr[mid] <= x:
+                    ans = mid
+                    low = mid + 1
+                else:
+                    high = mid - 1
+            return max(0, ans - l + 1)
+
+        # Step 2: count in both sorted halves
+        count = 0
+        count += countLE(pivot, n - 1)
+        if pivot > 0:
+            count += countLE(0, pivot - 1)
+
+        return count
+
+        solution 14 - class Solution{
+public:
+    long long get_Sum(int n, vector<int>& input)
+    {
+        long long sum = 0;
+        for (int i = 0; i < n; i++) {
+            sum += input[i];
+        }
+        return sum;
+    }
+};
