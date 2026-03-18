@@ -1,0 +1,349 @@
+
+WEAK 4 ( 9-2-26 t0 14-2-26)
+solution 1.class Solution:
+    def searchInsert(self, nums, target):
+        left = 0
+        right = len(nums) - 1
+
+        while left <= right:
+            mid = (left + right) // 2
+
+            if nums[mid] == target:
+                return mid
+            elif nums[mid] < target:
+                left = mid + 1
+            else:
+                right = mid - 1
+
+      
+        return left
+    
+solution 2.class Solution(object):
+    def combinationSum(self, candidates, target):
+        result = []
+
+        def backtrack(start, path, remaining):
+            if remaining == 0:
+                result.append(path[:])
+                return
+            if remaining < 0:
+                return
+
+            for i in range(start, len(candidates)):
+                path.append(candidates[i])
+                backtrack(i, path, remaining - candidates[i])  # reuse allowed
+                path.pop()
+
+        backtrack(0, [], target)
+        return result
+    
+solution 3. class Solution(object):
+    def combinationSum2(self, candidates, target):
+        candidates.sort()   # IMPORTANT: sort to handle duplicates
+        result = []
+
+        def backtrack(start, path, remaining):
+            if remaining == 0:
+                result.append(path[:])
+                return
+            if remaining < 0:
+                return
+
+            for i in range(start, len(candidates)):
+                # Skip duplicates at the same level
+                if i > start and candidates[i] == candidates[i - 1]:
+                    continue
+
+                path.append(candidates[i])
+                backtrack(i + 1, path, remaining - candidates[i])  # use once
+                path.pop()
+
+        backtrack(0, [], target)
+        return result
+    
+solution 4.class Solution(object):
+    def jump(self, nums):
+        jumps = 0
+        current_end = 0
+        farthest = 0
+
+        for i in range(len(nums) - 1):
+            farthest = max(farthest, i + nums[i])
+
+            if i == current_end:
+                jumps += 1
+                current_end = farthest
+
+        return jumps
+
+solution 5. class Solution(object):
+    def groupAnagrams(self, strs):
+        from collections import defaultdict
+        
+        anagrams = defaultdict(list)
+
+        for s in strs:
+            key = ''.join(sorted(s))
+            anagrams[key].append(s)
+
+        return list(anagrams.values())
+
+solution 6.  class Solution(object):
+    def plusOne(self, digits):
+        n = len(digits)
+
+        for i in range(n - 1, -1, -1):
+            if digits[i] < 9:
+                digits[i] += 1
+                return digits
+            digits[i] = 0
+
+        # If all digits were 9
+        return [1] + digits
+    
+solution 7. class Solution(object):
+    def setZeroes(self, matrix):
+        m, n = len(matrix), len(matrix[0])
+        
+        row0 = False
+        col0 = False
+
+        # Check first row
+        for j in range(n):
+            if matrix[0][j] == 0:
+                row0 = True
+
+        # Check first column
+        for i in range(m):
+            if matrix[i][0] == 0:
+                col0 = True
+
+        # Mark zeros
+        for i in range(1, m):
+            for j in range(1, n):
+                if matrix[i][j] == 0:
+                    matrix[i][0] = 0
+                    matrix[0][j] = 0
+
+        # Zero rows
+        for i in range(1, m):
+            if matrix[i][0] == 0:
+                for j in range(1, n):
+                    matrix[i][j] = 0
+
+        # Zero columns
+        for j in range(1, n):
+            if matrix[0][j] == 0:
+                for i in range(1, m):
+                    matrix[i][j] = 0
+
+        # Zero first row
+        if row0:
+            for j in range(n):
+                matrix[0][j] = 0
+
+        # Zero first column
+        if col0:
+            for i in range(m):
+                matrix[i][0] = 0
+
+solution 8.class Solution:
+    def searchMatrix(self, matrix, target):
+        if not matrix or not matrix[0]:
+            return False
+        
+        rows = len(matrix)
+        cols = len(matrix[0])
+        
+        low = 0
+        high = rows * cols - 1
+        
+        while low <= high:
+            mid = (low + high) // 2
+            r = mid // cols
+            c = mid % cols
+            
+            if matrix[r][c] == target:
+                return True
+            elif matrix[r][c] < target:
+                low = mid + 1
+            else:
+                high = mid-1
+        
+        return False
+
+        
+solution 9. class Solution(object):
+    def sortColors(self, nums):
+        low = 0
+        mid = 0
+        high = len(nums) - 1
+
+        while mid <= high:
+            if nums[mid] == 0:
+                nums[low], nums[mid] = nums[mid], nums[low]
+                low += 1
+                mid += 1
+
+            elif nums[mid] == 1:
+                mid += 1
+
+            else:  # nums[mid] == 2
+                nums[mid], nums[high] = nums[high], nums[mid]
+                high -= 1
+
+solution 10. class Solution(object):
+    def subsets(self, nums):
+        result = []
+
+        def backtrack(index, path):
+            # Every path is a valid subset
+            result.append(path[:])
+
+            for i in range(index, len(nums)):
+                path.append(nums[i])
+                backtrack(i + 1, path)
+                path.pop()
+
+        backtrack(0, [])
+        return result
+    
+solution 11. class Solution(object):
+    def exist(self, board, word):
+        m, n = len(board), len(board[0])
+
+        def dfs(i, j, index):
+            # All characters matched
+            if index == len(word):
+                return True
+
+            # Out of bounds or mismatch
+            if i < 0 or i >= m or j < 0 or j >= n or board[i][j] != word[index]:
+                return False
+
+            # Mark as visited
+            temp = board[i][j]
+            board[i][j] = '#'
+
+            # Explore 4 directions
+            found = (
+                dfs(i + 1, j, index + 1) or
+                dfs(i - 1, j, index + 1) or
+                dfs(i, j + 1, index + 1) or
+                dfs(i, j - 1, index + 1)
+            )
+
+            # Backtrack
+            board[i][j] = temp
+            return found
+
+        # Try starting from every cell
+        for i in range(m):
+            for j in range(n):
+                if dfs(i, j, 0):
+                    return True
+
+        return False
+    
+solution 12. class Solution(object):
+    def fourSum(self, nums, target):
+        nums.sort()
+        n = len(nums)
+        res = []
+
+        for i in range(n - 3):
+            # Skip duplicate i
+            if i > 0 and nums[i] == nums[i - 1]:
+                continue
+
+            for j in range(i + 1, n - 2):
+                # Skip duplicate j
+                if j > i + 1 and nums[j] == nums[j - 1]:
+                    continue
+
+                left, right = j + 1, n - 1
+
+                while left < right:
+                    total = nums[i] + nums[j] + nums[left] + nums[right]
+
+                    if total == target:
+                        res.append([nums[i], nums[j], nums[left], nums[right]])
+                        left += 1
+                        right -= 1
+
+                        # Skip duplicates
+                        while left < right and nums[left] == nums[left - 1]:
+                            left += 1
+                        while left < right and nums[right] == nums[right + 1]:
+                            right -= 1
+
+                    elif total < target:
+                        left += 1
+                    else:
+                        right -= 1
+
+        return res
+    
+question 13.   class Solution(object):
+    def search(self, nums, target):
+        left, right = 0, len(nums) - 1
+
+        while left <= right:
+            mid = (left + right) // 2
+
+            if nums[mid] == target:
+                return mid
+
+            # Left half is sorted
+            if nums[left] <= nums[mid]:
+                if nums[left] <= target < nums[mid]:
+                    right = mid - 1
+                else:
+                    left = mid + 1
+
+            # Right half is sorted
+            else:
+                if nums[mid] < target <= nums[right]:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+
+        return -1
+
+question 14. class Solution(object):
+    def searchRange(self, nums, target):
+
+        def findLeft():
+            left, right = 0, len(nums) - 1
+            idx = -1
+
+            while left <= right:
+                mid = (left + right) // 2
+                if nums[mid] >= target:
+                    right = mid - 1
+                else:
+                    left = mid + 1
+
+                if nums[mid] == target:
+                    idx = mid
+
+            return idx
+
+        def findRight():
+            left, right = 0, len(nums) - 1
+            idx = -1
+
+            while left <= right:
+                mid = (left + right) // 2
+                if nums[mid] <= target:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+
+                if nums[mid] == target:
+                    idx = mid
+
+            return idx
+
+        return [findLeft(), findRight()]
+    
