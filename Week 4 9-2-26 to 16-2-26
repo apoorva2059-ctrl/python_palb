@@ -1,5 +1,5 @@
 
-WEAK 4 ( 9-2-26 t0 14-2-26)
+WEEK 4 ( 9-2-26 t0 14-2-26)
 solution 1.class Solution:
     def searchInsert(self, nums, target):
         left = 0
