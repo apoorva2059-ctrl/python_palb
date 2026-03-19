@@ -1,0 +1,381 @@
+
+weak 6 
+
+1. class Solution {
+  public:
+    int minSwaps(string& s1, string& s2) {
+        int count01 = 0, count10 = 0;
+        
+        for(int i = 0; i < s1.size(); i++) {
+            if(s1[i] == '0' && s2[i] == '1') {
+                count01++;
+            }
+            else if(s1[i] == '1' && s2[i] == '0') {
+                count10++;
+            }
+        }
+        
+        // If total mismatches are odd → impossible
+        if((count01 + count10) % 2 != 0) {
+            return -1;
+        }
+        
+        int swaps = 0;
+        
+        // Pair same mismatches
+        swaps += count01 / 2;
+        swaps += count10 / 2;
+        
+        // If one of each remains → need 2 swaps
+        if(count01 % 2 == 1) {
+            swaps += 2;
+        }
+        
+        return swaps;
+    }
+};
+
+2.   class Solution {
+  public:
+    int minParentheses(string& s) {
+        int open = 0;  // unmatched '('
+        int add = 0;   // insertions needed
+        
+        for(char c : s) {
+            if(c == '(') {
+                open++;
+            } 
+            else { // ')'
+                if(open > 0) {
+                    open--;   // match
+                } else {
+                    add++;    // need '('
+                }
+            }
+        }
+        
+        // remaining '(' need ')'
+        add += open;
+        
+        return add;
+    }
+};
+
+
+3.   class Solution {
+  public:
+    int scoreOfParentheses(string& s) {
+        int score = 0;
+        int depth = 0;
+        
+        for(int i = 0; i < s.size(); i++) {
+            if(s[i] == '(') {
+                depth++;
+            } else {
+                depth--;
+                
+                // Check for "()"
+                if(s[i-1] == '(') {
+                    score += (1 << depth);
+                }
+            }
+        }
+        
+        return score;
+    }
+};
+
+
+
+4.   class Solution {
+  public:
+    int minDifference(vector<string> &arr) {
+        vector<int> times;
+        
+        // Convert to seconds
+        for(string t : arr) {
+            int h = stoi(t.substr(0, 2));
+            int m = stoi(t.substr(3, 2));
+            int s = stoi(t.substr(6, 2));
+            
+            int total = h * 3600 + m * 60 + s;
+            times.push_back(total);
+        }
+        
+        // Sort times
+        sort(times.begin(), times.end());
+        
+        int n = times.size();
+        int ans = INT_MAX;
+        
+        // Adjacent differences
+        for(int i = 1; i < n; i++) {
+            ans = min(ans, times[i] - times[i-1]);
+        }
+        
+        // Circular difference (last ↔ first)
+        ans = min(ans, 86400 - times[n-1] + times[0]);
+        
+        return ans;
+    }
+};
+
+
+5. class Solution {
+  public:
+    string frequencySort(string &s) {
+        vector<int> freq(26, 0);
+        
+        // Step 1: Count frequency
+        for(char c : s) {
+            freq[c - 'a']++;
+        }
+        
+        // Step 2: Store characters
+        vector<pair<int, char>> v;
+        
+        for(int i = 0; i < 26; i++) {
+            if(freq[i] > 0) {
+                v.push_back({freq[i], char('a' + i)});
+            }
+        }
+        
+        // Step 3: Sort
+        sort(v.begin(), v.end(), [](auto &a, auto &b) {
+            if(a.first == b.first)
+                return a.second < b.second; // lexicographical
+            return a.first < b.first;       // frequency
+        });
+        
+        // Step 4: Build result
+        string result = "";
+        
+        for(auto &p : v) {
+            result += string(p.first, p.second);
+        }
+        
+        return result;
+    }
+};
+
+
+6. class Solution {
+  public:
+    void sortByLength(vector<string>& arr) {
+        stable_sort(arr.begin(), arr.end(), 
+            [](const string &a, const string &b) {
+                return a.length() < b.length();
+            }
+        );
+    }
+};
+
+7.class Solution {
+  public:
+    int countPairs(vector<string>& arr) {
+        unordered_map<string, int> mp;
+        int ans = 0;
+        
+        for(string s : arr) {
+            for(int i = 0; i < s.size(); i++) {
+                string temp = s;
+                temp[i] = '*';  // mask
+                
+                // Count how many already seen
+                ans += mp[temp];
+                
+                // Store pattern
+                mp[temp]++;
+            }
+        }
+        
+        return ans;
+    }
+};
+
+
+8.  class Solution:
+    def winner(self, arr):
+        freq = {}
+        
+        # Step 1: Count votes
+        for name in arr:
+            freq[name] = freq.get(name, 0) + 1
+        
+        max_votes = 0
+        winner = ""
+        
+        # Step 2: Find winner
+        for name in freq:
+            if freq[name] > max_votes:
+                max_votes = freq[name]
+                winner = name
+            elif freq[name] == max_votes:
+                if name < winner:
+                    winner = name
+        
+        return [winner, str(max_votes)]
+
+
+9. class Solution:
+    def search(self, txt, pat):
+        n, m = len(txt), len(pat)
+        
+        if m > n:
+            return False
+        
+        pat_count = [0] * 26
+        window_count = [0] * 26
+        
+        # Count pattern
+        for c in pat:
+            pat_count[ord(c) - ord('a')] += 1
+        
+        # First window
+        for i in range(m):
+            window_count[ord(txt[i]) - ord('a')] += 1
+        
+        # Check first window
+        if window_count == pat_count:
+            return True
+        
+        # Slide window
+        for i in range(m, n):
+            # Add new char
+            window_count[ord(txt[i]) - ord('a')] += 1
+            
+            # Remove old char
+            window_count[ord(txt[i - m]) - ord('a')] -= 1
+            
+            # Compare
+            if window_count == pat_count:
+                return True
+        
+        return False
+
+
+10.   class Solution:
+    def maxSubseq(self, s, k):
+        stack = []
+        
+        for c in s:
+            while stack and k > 0 and stack[-1] < c:
+                stack.pop()
+                k -= 1
+            stack.append(c)
+        
+        # If still k > 0, remove from end
+        while k > 0:
+            stack.pop()
+            k -= 1
+        
+        return "".join(stack)
+
+11. class Solution:
+    def vowelCount(self, s):
+        from math import factorial
+        
+        vowels = {'a', 'e', 'i', 'o', 'u'}
+        freq = {}
+        
+        # Count frequencies of vowels
+        for c in s:
+            if c in vowels:
+                freq[c] = freq.get(c, 0) + 1
+        
+        k = len(freq)
+        
+        # If no vowels
+        if k == 0:
+            return 0
+        
+        # Product of frequencies
+        prod = 1
+        for count in freq.values():
+            prod *= count
+        
+        # Multiply with k!
+        return prod * factorial(k)
+
+
+12. class Solution:
+    def count(self, s):
+        freq = [0] * 26
+        
+        # Count frequencies
+        for c in s:
+            freq[ord(c) - ord('a')] += 1
+        
+        ans = 0
+        
+        # Count even frequencies
+        for f in freq:
+            if f > 0 and f % 2 == 0:
+                ans += 1
+        
+        return ans
+
+
+
+13. class Solution:
+    def substrWithVowels(self, s1, s2):
+        required = set(s1)
+        freq = {}
+        
+        left = 0
+        formed = 0
+        need = len(required)
+        ans = float('inf')
+        
+        for right in range(len(s2)):
+            c = s2[right]
+            
+            if c in required:
+                freq[c] = freq.get(c, 0) + 1
+                if freq[c] == 1:
+                    formed += 1
+            
+            # Try shrinking window
+            while formed == need:
+                ans = min(ans, right - left + 1)
+                
+                left_char = s2[left]
+                if left_char in required:
+                    freq[left_char] -= 1
+                    if freq[left_char] == 0:
+                        formed -= 1
+                
+                left += 1
+        
+        return ans if ans != float('inf') else -1
+
+
+14. class Solution:
+    def countBalanced(self, arr):
+        vowels = set('aeiou')
+        
+        # Step 1: convert each string to value
+        values = []
+        for s in arr:
+            v = 0
+            for c in s:
+                if c in vowels:
+                    v += 1
+                else:
+                    v -= 1
+            values.append(v)
+        
+        # Step 2: count subarrays with sum = 0
+        prefix_sum = 0
+        mp = {0: 1}   # important
+        count = 0
+        
+        for val in values:
+            prefix_sum += val
+            
+            if prefix_sum in mp:
+                count += mp[prefix_sum]
+            
+            mp[prefix_sum] = mp.get(prefix_sum, 0) + 1
+        
+        return count
