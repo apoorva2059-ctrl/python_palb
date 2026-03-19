@@ -1,5 +1,5 @@
 
-WEAK 5 ( 16-2-26 t0 21-2-26)
+WEEK 5 ( 16-2-26 t0 21-2-26)
 solution 1. // class Solution:
 class Solution:
     def submatrixSum(self, a, n, m, query, q):
